@@ -1,0 +1,127 @@
+﻿@page "/Articulos"
+@using Data.Model
+@using Data.Service
+@using Microsoft.AspNetCore.Components;
+
+@inject IArticuloService ArticuloService
+@inject NavigationManager NavigationManager
+@inject IBusquedaService BusquedaService
+
+
+<header>
+    <div class="container-fluid  header-block trsn py-lg-4 py-0">
+        <div class="row align-items-center no-gutters"> 
+            <div class="col-sm-12 text-center">
+                <a href="/">
+                    <img style="max-width:15%" src="https://firebasestorage.googleapis.com/v0/b/gamertechnology-e709a.appspot.com/o/WhatsApp_Image_2022-04-03_at_11.05.13_PM-removebg-preview.png?alt=media&token=a2b9a609-80f9-495a-b6d2-4ab58d43c7ba" class="navbar-brand store-image img-fluid" />
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+<div>
+    <nav id="main-menu" class="navbar-expand-md d-none d-lg-block vertical_menu navbar-fixed">
+        <div class="collapse navbar-collapse" id="navbarsContainer">
+            <ul class="navbar-nav m-auto">
+                <li class="nav-item">
+                    <a href="#" title="Combos" class="level-1 trsn nav-link">Combos</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" title="Tarjeta Grafica" class="level-1 trsn nav-link">Tarjetas Graficas</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" title="Pantallas" class="level-1 trsn nav-link">Pantallas</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" title="Periféricos" class="level-1 trsn nav-link">Periféricos</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" title="LISTA PARTES" class="dropdown-toggle level-1 trsn nav-link" data-toggle>Lista de Partes</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" title="Sillas" class="level-1 trsn nav-link">Sillas</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/descuentos" title="Descuentos" class="level-1 trsn nav-link">Descuentos</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
+
+<div style="display:flex; justify-content:center;align-content:center">
+    <div class="input-group col-md-6">
+        <input @bind="busqueda" type="text" placeholder="Buscar producto" class="form-control mr-sm-2" />
+        <span class="input-group-btn">
+            <input type="submit" class="btn btn-outline-success my-2 my-sm-0" value="Buscar" @onclick="(() => Buscar())" />
+        </span>
+    </div>
+</div>
+
+@if (articulos == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row mb-md-5 mb-4 mx-md-n2 mx-n1 no-gutters">
+        @foreach (var item in articulos)
+        {
+            <div class="col-lg-3 col-6 px-md-2 px-1">
+                <div class="product-block text-center mb-md-3 mb-2 p-md-3 p-2 rounded trsn" style="border:1px solid #f1f1f1">
+                    <a href="/PageArticulo/@item.IdArticulo" class="product-image d-block ">
+                        <img class="img-portfolio img-hover mb-2" src="@item.Imagen" style="max-width: 80%" alt="@item.Nombre">
+
+                    </a>
+                    <div class="caption">
+                        <div class="brand-name small trsn">
+
+                            <h4><a href="/teclado-mintaka-mecanico-rgb">@item.Nombre</a></h4>
+                        </div>
+
+                        <div class="list-price">
+
+                            <span class="product-block-normal">$@string.Format("{0:#,#}",item.Precio) COP</span>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+
+}
+
+@code {
+
+
+    private IEnumerable<Articulo> articulos;
+
+    private string busqueda { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            articulos = await ArticuloService.GetAll();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    protected async Task Buscar()
+    {
+        if(busqueda != null)
+        {
+            articulos = await BusquedaService.GetBusqueda(busqueda);
+        }
+        else
+        {
+            articulos = await ArticuloService.GetAll();
+        }
+    }
+}

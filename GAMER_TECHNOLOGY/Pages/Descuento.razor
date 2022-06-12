@@ -1,0 +1,84 @@
+﻿@page "/descuentos"
+
+@using Data.Model
+@using Data.Service
+@using Microsoft.AspNetCore.Components;
+
+@inject IArticuloService ArticuloService
+@inject NavigationManager NavigationManager
+
+<header>
+    <div class="container-fluid  header-block trsn py-lg-4 py-0">
+        <div class="row align-items-center no-gutters">
+            <div class="col-sm-12 text-center">
+                <a href="/">
+                    <img style="max-width:15%" src="https://firebasestorage.googleapis.com/v0/b/gamertechnology-e709a.appspot.com/o/WhatsApp_Image_2022-04-03_at_11.05.13_PM-removebg-preview.png?alt=media&token=a2b9a609-80f9-495a-b6d2-4ab58d43c7ba" class="navbar-brand store-image img-fluid" />
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+<h5>Productos con descuentos</h5>
+@if (articulos == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row mb-md-5 mb-4 mx-md-n2 mx-n1 no-gutters">
+        @foreach (var item in articulos)
+        {
+            subtotal =  cantidad * item.Precio;
+            descuento = subtotal / 100 * item.Descuento;
+            total = subtotal - descuento;
+
+            <div class="col-lg-3 col-6 px-md-2 px-1">
+                <div class="product-block text-center mb-md-3 mb-2 p-md-3 p-2 rounded trsn" style="border:1px solid #f1f1f1">
+                    <a href="/PageArticulo/@item.IdArticulo" class="product-image d-block ">
+                        <span class="badge status-tag sale" style="color:white;background-color: #c60613!important; position: absolute; text-transform: uppercase; z-index: 2; top: 15px; left: 6%;font-size: 0.75em">Descuento -@item.Descuento%</span>
+                        <img class="img-portfolio img-hover mb-2" src="@item.Imagen" style="max-width: 80%" alt="@item.Nombre">
+
+                    </a>
+                    <div class="caption">
+                        <div class="brand-name small trsn">
+
+                            <h4><a href="/teclado-mintaka-mecanico-rgb">@item.Nombre</a></h4>
+                        </div>
+
+                        <div class="list-price">
+
+                            <span class="product-block-normal">$@string.Format("{0:#,#}",total) COP</span>
+                            <span class="product-block-discount text-muted" style="text-decoration: line-through">$@string.Format("{0:#,#}",item.Precio) COP</span>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+
+}
+
+@code {
+    private IEnumerable<Articulo> articulos;
+
+        public double subtotal = 0;
+    public double descuento = 0;
+    public double total = 0;
+    public int cantidad = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            articulos = await ArticuloService.GetCategoria();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+}
